@@ -1,0 +1,49 @@
+---
+- name: Kubernetes | Ensure required directory exist
+  file: path={{ item }} state=directory
+  with_items:
+    - "{{ bin_dir }}"
+    - "{{ systemd_units_dir }}"
+    - "{{ kubelet_systemd_dropin_dir }}"
+
+- name: Kubernetes | Get Kubernetes binaries
+  get_url:
+    url: "{{ kubernetes_binaries_url }}/{{ item }}"
+    mode: 0755
+    dest: "{{ bin_dir }}/{{ item }}"
+    force: yes
+  with_items: "{{ kubernetes_binaries }}"
+  notify: "restart kubelet"
+
+- name: Kubernetes | Get Kubelet config file
+  get_url:
+    url: "{{ kubelet_systemd_unit_url }}"
+    dest: "{{ kubelet_systemd_unit }}"
+    force: yes
+
+- name: Kubernetes | Get Kubeadm drop-in file
+  get_url:
+    url: "{{ kubeadm_systemd_dropin_url }}"
+    dest: "{{ kubeadm_systemd_dropin_file }}"
+    force: yes
+
+- name: Kubernetes | s:/usr/bin:/opt/bin:g
+  replace:
+    path: "{{ item }}"
+    regexp: "/usr/bin"
+    replace: "{{ bin_dir }}"
+  with_items:
+    - "{{ kubelet_systemd_unit }}"
+    - "{{ kubeadm_systemd_dropin_file }}"
+
+- name: Kubernetes | Get CRI drop-in file
+  template:
+    src: 20-cri.conf.j2
+    dest: "{{ cri_systemd_dropin_file }}"
+
+- name: Kubernetes | Ensure Kubelet is running
+  systemd:
+    state: started
+    name: kubelet.service
+    daemon_reload: yes
+    enabled: yes
