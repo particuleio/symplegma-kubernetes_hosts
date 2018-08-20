@@ -17,6 +17,8 @@ kubelet_systemd_dropin_dir: "{{ kubelet_systemd_unit }}.d"
 kubeadm_systemd_dropin_url: https://raw.githubusercontent.com/kubernetes/kubernetes/{{ kubernetes_version }}/build/debs/10-kubeadm.conf
 kubeadm_systemd_dropin_file: "{{ kubelet_systemd_dropin_dir }}/10-kubeadm.conf"
 
-cri_container_runtime_endpoint: "unix:///run/containerd/containerd.sock"
-cri_image_service_endpoint: "{{ cri_container_runtime_endpoint }}"
+cri_socket: "unix:///run/containerd/containerd.sock"
 cri_systemd_dropin_file: "{{ kubelet_systemd_dropin_dir }}/20-cri.conf"
+
+crictl_release_url: https://github.com/kubernetes-incubator/cri-tools/releases/download/v1.11.1/crictl-{{ crictl_version }}-linux-amd64.tar.gz
+crictl_version: v1.11.1

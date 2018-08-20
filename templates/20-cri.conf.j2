@@ -1,2 +1,2 @@
 [Service]
-Environment="KUBELET_EXTRA_ARGS=--container-runtime=remote --container-runtime-endpoint={{ cri_container_runtime_endpoint }} --image-service-endpoint={{ cri_image_service_endpoint }}"
+Environment="KUBELET_EXTRA_ARGS=--container-runtime=remote --container-runtime-endpoint={{ cri_socket }} --image-service-endpoint={{ cri_socket }}"

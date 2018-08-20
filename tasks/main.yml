@@ -15,6 +15,12 @@
   with_items: "{{ kubernetes_binaries }}"
   notify: "restart kubelet"
 
+- name: Kubernetes | Get crictl
+  unarchive:
+    src: "{{ crictl_release_url }}"
+    dest: "{{ bin_dir }}"
+    remote_src: yes
+
 - name: Kubernetes | Get Kubelet config file
   get_url:
     url: "{{ kubelet_systemd_unit_url }}"
