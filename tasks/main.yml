@@ -22,25 +22,18 @@
     remote_src: yes
 
 - name: Kubernetes | Get Kubelet config file
-  get_url:
-    url: "{{ kubelet_systemd_unit_url }}"
+  copy:
+    content: "{{ item | regex_replace( '/usr/bin', bin_dir) }}"
     dest: "{{ kubelet_systemd_unit }}"
     force: yes
+  loop: "{{ lookup('url', kubelet_systemd_unit_url, split_lines=False, wantlist=True )}}"
 
 - name: Kubernetes | Get Kubeadm drop-in file
-  get_url:
-    url: "{{ kubeadm_systemd_dropin_url }}"
+  copy:
+    content: "{{ item | regex_replace( '/usr/bin', bin_dir) }}"
     dest: "{{ kubeadm_systemd_dropin_file }}"
     force: yes
-
-- name: Kubernetes | s:/usr/bin:/opt/bin:g
-  replace:
-    path: "{{ item }}"
-    regexp: "/usr/bin"
-    replace: "{{ bin_dir }}"
-  with_items:
-    - "{{ kubelet_systemd_unit }}"
-    - "{{ kubeadm_systemd_dropin_file }}"
+  loop: "{{ lookup('url', kubeadm_systemd_dropin_url, split_lines=False, wantlist=True )}}"
 
 - name: Kubernetes | Get CRI drop-in file
   template:
