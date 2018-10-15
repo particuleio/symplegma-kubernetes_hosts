@@ -27,6 +27,7 @@
     dest: "{{ kubelet_systemd_unit }}"
     force: yes
   loop: "{{ lookup('url', kubelet_systemd_unit_url, split_lines=False, wantlist=True )}}"
+  notify: "restart kubelet"
 
 - name: Kubernetes | Get Kubeadm drop-in file
   copy:
@@ -34,10 +35,12 @@
     dest: "{{ kubeadm_systemd_dropin_file }}"
     force: yes
   loop: "{{ lookup('url', kubeadm_systemd_dropin_url, split_lines=False, wantlist=True )}}"
+  notify: "restart kubelet"
 
-- name: Kubernetes | Ensure Kubelet is running
+- meta: flush_handlers
+
+- name: Kubernetes | Ensure Kubelet is enabled and running
   systemd:
     state: started
     name: kubelet.service
-    daemon_reload: yes
     enabled: yes

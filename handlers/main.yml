@@ -1,5 +1,5 @@
 ---
-- name: Kubernetes | Restart Kubelet
+- name: Kubernetes | Perform a daemon reload and restart Kubelet
   systemd:
     state: restarted
     name: kubelet.service
