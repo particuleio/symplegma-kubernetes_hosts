@@ -35,11 +35,6 @@
     force: yes
   loop: "{{ lookup('url', kubeadm_systemd_dropin_url, split_lines=False, wantlist=True )}}"
 
-- name: Kubernetes | Get CRI drop-in file
-  template:
-    src: 20-cri.conf.j2
-    dest: "{{ cri_systemd_dropin_file }}"
-
 - name: Kubernetes | Ensure Kubelet is running
   systemd:
     state: started
