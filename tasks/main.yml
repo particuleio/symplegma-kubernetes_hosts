@@ -27,16 +27,19 @@
     content: "{{ item | regex_replace( '/usr/bin', bin_dir) }}"
     dest: "{{ kubelet_systemd_unit }}"
   loop: "{{ lookup('url', kubelet_systemd_unit_url, split_lines=False, wantlist=True )}}"
+  notify: "restart kubelet"
 
 - name: Kubernetes | Get Kubeadm drop-in file
   copy:
     content: "{{ item | regex_replace( '/usr/bin', bin_dir) }}"
     dest: "{{ kubeadm_systemd_dropin_file }}"
   loop: "{{ lookup('url', kubeadm_systemd_dropin_url, split_lines=False, wantlist=True )}}"
+  notify: "restart kubelet"
 
-- name: Kubernetes | Ensure Kubelet is running
+- meta: flush_handlers
+
+- name: Kubernetes | Ensure Kubelet is enabled and running
   systemd:
     state: started
     name: kubelet.service
-    daemon_reload: yes
     enabled: yes
