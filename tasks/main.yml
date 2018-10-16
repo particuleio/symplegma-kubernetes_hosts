@@ -1,6 +1,8 @@
 ---
 - name: Kubernetes | Ensure required directory exist
-  file: path={{ item }} state=directory
+  file:
+    path: "{{ item }}"
+    state: directory
   with_items:
     - "{{ bin_dir }}"
     - "{{ systemd_units_dir }}"
@@ -11,7 +13,6 @@
     url: "{{ kubernetes_binaries_url }}/{{ item }}"
     mode: 0755
     dest: "{{ bin_dir }}/{{ item }}"
-    force: yes
   with_items: "{{ kubernetes_binaries }}"
   notify: "restart kubelet"
 
@@ -25,7 +26,6 @@
   copy:
     content: "{{ item | regex_replace( '/usr/bin', bin_dir) }}"
     dest: "{{ kubelet_systemd_unit }}"
-    force: yes
   loop: "{{ lookup('url', kubelet_systemd_unit_url, split_lines=False, wantlist=True )}}"
   notify: "restart kubelet"
 
@@ -33,7 +33,6 @@
   copy:
     content: "{{ item | regex_replace( '/usr/bin', bin_dir) }}"
     dest: "{{ kubeadm_systemd_dropin_file }}"
-    force: yes
   loop: "{{ lookup('url', kubeadm_systemd_dropin_url, split_lines=False, wantlist=True )}}"
   notify: "restart kubelet"
 
