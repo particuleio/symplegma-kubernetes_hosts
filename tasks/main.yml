@@ -13,6 +13,7 @@
     url: "{{ kubernetes_binaries_url }}/{{ item }}"
     mode: 0755
     dest: "{{ bin_dir }}/{{ item }}"
+    force: yes
   with_items: "{{ kubernetes_binaries }}"
   notify: "restart kubelet"
 
