@@ -23,6 +23,17 @@
     dest: "{{ bin_dir }}"
     remote_src: yes
 
+- name: Kubernetes | Install crictl config
+  template:
+    src: crictl.yaml.j2
+    dest: /etc/crictl.yaml
+    mode: 0644
+
+- name: Kubernets | Install crictl completion
+  shell: "{{ bin_dir }}/crictl completion > /etc/bash_completion.d/crictl"
+  ignore_errors: True
+  when: ansible_distribution in ["CentOS","RedHat", "Ubuntu", "Debian"]
+
 - name: Kubernetes | Get Kubelet config file
   copy:
     content: "{{ item | regex_replace( '/usr/bin', bin_dir) }}"
