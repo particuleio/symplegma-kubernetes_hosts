@@ -43,6 +43,16 @@
   loop: "{{ lookup('url', kubeadm_systemd_dropin_url, split_lines=False, wantlist=True ) }}"
   notify: "restart kubelet"
 
+- name: Kubernetes | Set node-ip if defined
+  lineinfile:
+    create: yes
+    path: /etc/default/kubelet
+    line: 'KUBELET_EXTRA_ARGS=--node-ip={{ kubelet_node_ip }}'
+    regexp: 'KUBELET_EXTRA_ARGS='
+    state: present
+  when: kubelet_node_ip is defined
+  notify: "restart kubelet"
+
 - meta: flush_handlers
 
 - name: Kubernetes | Ensure Kubelet is enabled and running
