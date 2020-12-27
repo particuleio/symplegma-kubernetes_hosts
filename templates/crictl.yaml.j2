@@ -1,4 +1,6 @@
 runtime-endpoint: {{ cri_socket }}
 image-endpoint: {{ cri_socket }}
-timeout: 30
+timeout: 0
 debug: false
+pull-image-on-create: true
+disable-pull-on-run: false
