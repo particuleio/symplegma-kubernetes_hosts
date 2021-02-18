@@ -3,6 +3,7 @@
   file:
     path: "{{ item }}"
     state: directory
+    mode: "u+rw,g+r,o+r"
   with_items:
     - "{{ bin_dir }}"
     - "{{ systemd_units_dir }}"
@@ -13,7 +14,7 @@
     url: "{{ kubernetes_binaries_url }}/{{ item }}"
     mode: 0755
     dest: "{{ bin_dir }}/{{ item }}"
-    force: yes
+    force: true
   with_items: "{{ kubernetes_binaries }}"
   notify: "restart kubelet"
 
@@ -21,17 +22,18 @@
   unarchive:
     src: "{{ crictl_release_url }}"
     dest: "{{ bin_dir }}"
-    remote_src: yes
+    remote_src: true
 
 - name: Kubernetes | Install crictl config
   template:
     src: crictl.yaml.j2
     dest: /etc/crictl.yaml
-    mode: 0644
+    mode: 'u+rw,g+r,o+r'
 
 - name: Kubernetes | Get Kubelet config file
   copy:
     content: "{{ item | regex_replace( '/usr/bin', bin_dir) }}"
+    mode: 'u+rw,g+r,o+r'
     dest: "{{ kubelet_systemd_unit }}"
   loop: "{{ lookup('url', kubelet_systemd_unit_url, split_lines=False, wantlist=True ) }}"
   notify: "restart kubelet"
@@ -39,13 +41,14 @@
 - name: Kubernetes | Get Kubeadm drop-in file
   copy:
     content: "{{ item | regex_replace( '/usr/bin', bin_dir) }}"
+    mode: 'u+rw,g+r,o+r'
     dest: "{{ kubeadm_systemd_dropin_file }}"
   loop: "{{ lookup('url', kubeadm_systemd_dropin_url, split_lines=False, wantlist=True ) }}"
   notify: "restart kubelet"
 
 - name: Kubernetes | Set kubelet extra args if defined
   lineinfile:
-    create: yes
+    create: true
     path: /etc/default/kubelet
     line: 'KUBELET_EXTRA_ARGS={{ kubelet_extra_args }}'
     regexp: 'KUBELET_EXTRA_ARGS='
@@ -59,4 +62,4 @@
   systemd:
     state: started
     name: kubelet.service
-    enabled: yes
+    enabled: true
