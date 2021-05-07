@@ -50,13 +50,15 @@
   lineinfile:
     create: true
     path: /etc/default/kubelet
+    mode: 'u+rw,g+r,o+r'
     line: 'KUBELET_EXTRA_ARGS={{ kubelet_extra_args }}'
     regexp: 'KUBELET_EXTRA_ARGS='
     state: present
   when: kubelet_extra_args is defined
   notify: "restart kubelet"
 
-- meta: flush_handlers
+- name: Kubernetes | Trigger "restart kubelet" handler
+  meta: flush_handlers
 
 - name: Kubernetes | Ensure Kubelet is enabled and running
   systemd:
