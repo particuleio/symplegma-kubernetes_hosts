@@ -2,8 +2,8 @@
 bin_dir: /opt/bin
 systemd_units_dir: /etc/systemd/system
 
-kubernetes_version: v1.22.1
-kubernetes_release_repo_version: v0.10.0
+kubernetes_version: v1.24.1
+kubernetes_release_repo_version: v0.13.0
 kubernetes_binaries:
   - kubeadm
   - kubectl
@@ -21,4 +21,4 @@ kubeadm_systemd_dropin_file: "{{ kubelet_systemd_dropin_dir }}/10-kubeadm.conf"
 cri_socket: unix:///run/containerd/containerd.sock
 
 crictl_release_url: https://github.com/kubernetes-incubator/cri-tools/releases/download/{{ crictl_version }}/crictl-{{ crictl_version }}-linux-amd64.tar.gz
-crictl_version: v1.22.0
+crictl_version: v1.24.2
