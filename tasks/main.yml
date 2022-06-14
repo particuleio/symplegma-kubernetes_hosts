@@ -1,6 +1,6 @@
 ---
 - name: Kubernetes | Ensure required directory exist
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: "u+rw,g+r,o+r"
@@ -10,7 +10,7 @@
     - "{{ kubelet_systemd_dropin_dir }}"
 
 - name: Kubernetes | Get Kubernetes binaries
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ kubernetes_binaries_url }}/{{ item }}"
     mode: 0755
     dest: "{{ bin_dir }}/{{ item }}"
@@ -19,19 +19,19 @@
   notify: "restart kubelet"
 
 - name: Kubernetes | Get crictl
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ crictl_release_url }}"
     dest: "{{ bin_dir }}"
     remote_src: true
 
 - name: Kubernetes | Install crictl config
-  template:
+  ansible.builtin.template:
     src: crictl.yaml.j2
     dest: /etc/crictl.yaml
     mode: 'u+rw,g+r,o+r'
 
 - name: Kubernetes | Get Kubelet config file
-  copy:
+  ansible.builtin.copy:
     content: "{{ item | regex_replace( '/usr/bin', bin_dir) }}"
     mode: 'u+rw,g+r,o+r'
     dest: "{{ kubelet_systemd_unit }}"
@@ -39,7 +39,7 @@
   notify: "restart kubelet"
 
 - name: Kubernetes | Get Kubeadm drop-in file
-  copy:
+  ansible.builtin.copy:
     content: "{{ item | regex_replace( '/usr/bin', bin_dir) }}"
     mode: 'u+rw,g+r,o+r'
     dest: "{{ kubeadm_systemd_dropin_file }}"
@@ -47,7 +47,7 @@
   notify: "restart kubelet"
 
 - name: Kubernetes | Set kubelet extra args if defined
-  lineinfile:
+  ansible.builtin.lineinfile:
     create: true
     path: /etc/default/kubelet
     mode: 'u+rw,g+r,o+r'
@@ -58,10 +58,10 @@
   notify: "restart kubelet"
 
 - name: Kubernetes | Trigger "restart kubelet" handler
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Kubernetes | Ensure Kubelet is enabled and running
-  systemd:
+  ansible.builtin.systemd:
     state: started
     name: kubelet.service
     enabled: true
